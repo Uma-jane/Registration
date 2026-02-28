@@ -16,8 +16,21 @@ const inMemoryUsers = new Map();
 let inMemoryId = 1;
 
 // Middleware
+const allowedOrigins = [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    process.env.FRONTEND_URL
+].filter(Boolean);
+
 app.use(cors({
-    origin: 'http://localhost:5173', // Vite default port
+    origin: function(origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) === -1) {
+            return callback(null, true); // Allow all origins for now
+        }
+        return callback(null, true);
+    },
     credentials: true
 }));
 app.use(express.json());
